@@ -1,21 +1,22 @@
 <?php
-$email_from = "";   // Sender if none specified
-$sendermail_antwort = true;      // Email address of the visitor as sender
-$name_from_email = "Email";   // Field containing the sender address
+//send_email.php
+$email_from = "absender@domain.de";   // Absender falls keiner angegeben wurde
+$sendermail_antwort = true;      // E-Mail Adresse des Besuchers als Absender. false= Nein ; true = Ja
+$name_von_emailfeld = "Email";   // Feld in der die Absenderadresse steht
  
-$recipient = "YOUR@EMAIL.COM"; // recipient address
-$mail_cc = ""; // CC address, this email address gets another copy
-$subject = "New contact request"; // subject of the email
+$empfaenger = "EMAIL"; //Empfänger-Adresse
+$mail_cc = ""; // CC-Adresse, diese E-Mail-Adresse bekommt einer weitere Kopie
+$betreff = "Neue Kontaktanfrage"; // Betreff der Email
  
-$ok = "./mail-erfolgreich.html"; // Target page when email was sent successfully
-$error = "./mail-fehlgeschlagen.html"; // Landing page when email could not be sent
+$ok = "./mail-erfolgreich.html"; // Zielseite, wenn E-Mail erfolgreich versendet wurde
+$fehler = "./mail-fehlgeschlagen.html"; // Zielseite, wenn E-Mail nicht gesendet werden konnte
  
  
-// These fields will not be in the mail
+// Diese Felder werden nicht in der Mail stehen
 $ignore_fields = array('submit');
 
-// Date when the email was created
-$name_tag = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+// Datum, wann die Mail erstellt wurde
+$name_tag = array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag");
 $num_tag = date("w");
 $tag = $name_tag[$num_tag];
 $jahr = date("Y");
@@ -23,20 +24,20 @@ $n = date("d");
 $monat = date("m");
 $time = date("H:i");
  
-// First line of the email
-$msg = ">> Sent on $tag, $n.$monat.$jahr - $time Clock <<\n\n";
+// Erste Zeile unserer Email
+$msg = ">> Gesendet am $tag, $n.$monat.$jahr - $time Uhr <<\n\n";
  
-// All input fields are queried here
+// Hier werden alle Eingabefelder abgefragt
 foreach($_POST as $name => $value) {
    if (in_array($name, $ignore_fields)) {
-        continue; // Ignore fields will not be included in the mail
+        continue; //Ignore Felder wird nicht in die Mail eingefügt
    }
    $msg .= ">> $name <<\n$value\n\n";
 }
- 
-// Email address of the visitor as sender
-if ($sendermail_antwort and isset($_POST[$name_from_email]) and filter_var($_POST[$name_from_email], FILTER_VALIDATE_EMAIL)) {
-   $email_from = $_POST[$name_from_email];
+
+// E-Mail Adresse des Besuchers als Absender
+if ($sendermail_antwort and isset($_POST[$name_von_emailfeld]) and filter_var($_POST[$name_von_emailfeld], FILTER_VALIDATE_EMAIL)) {
+   $email_from = $_POST[$name_von_emailfeld];
 }
  
 $header="From: $email_from";
@@ -46,18 +47,19 @@ if (!empty($mail_cc)) {
    $header .= "Cc: $mail_cc";
 }
  
-// Send email as UTF-8
+// Email als UTF-8 senden
 $header .= "\nContent-type: text/plain; charset=utf-8";
  
-$mail_senden = mail($recipient,$subject,$msg,$header);
-
-// Forwarding, there could now also be outputs here via echo
+$mail_senden = mail($empfaenger,$betreff,$msg,$header);
+ 
+ 
+// Weiterleitung, hier konnte jetzt per echo auch Ausgaben stehen
 if($mail_senden){
-  header("Location: ".$ok); // Mail has been sent
+  header("Location: ".$ok); // Mail wurde gesendet
 
   exit();
 } else{
-  header("Location: ".$error); // Error sending
+  header("Location: ".$fehler); // Fehler beim Senden
   exit();
 }
 ?>
